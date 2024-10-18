@@ -86,14 +86,17 @@ class ModelGAN(ModelBase):
     # save model / optimizer(optional)
     # ----------------------------------------
     def save(self, iter_label):
+        print("saving")
         self.save_network(self.save_dir, self.netG, 'G', iter_label)
+        print("saving")
         self.save_network(self.save_dir, self.netD, 'D', iter_label)
-        if self.opt_train['E_decay'] > 0:
-            self.save_network(self.save_dir, self.netE, 'E', iter_label)
-        if self.opt_train['G_optimizer_reuse']:
-            self.save_optimizer(self.save_dir, self.G_optimizer, 'optimizerG', iter_label)
-        if self.opt_train['D_optimizer_reuse']:
-            self.save_optimizer(self.save_dir, self.D_optimizer, 'optimizerD', iter_label)
+        print("saving")
+        self.save_network(self.save_dir, self.netE, 'E', iter_label)
+        print("saving")
+        self.save_optimizer(self.save_dir, self.G_optimizer, 'optimizerG', iter_label)
+        print("saving")
+        self.save_optimizer(self.save_dir, self.D_optimizer, 'optimizerD', iter_label)
+        print("saving")
 
     # ----------------------------------------
     # define loss
@@ -185,10 +188,9 @@ class ModelGAN(ModelBase):
     # ----------------------------------------
     # feed L/H data
     # ----------------------------------------
-    def feed_data(self, data, need_H=True):
-        self.L = data['L'].to(self.device)
-        if need_H:
-            self.H = data['H'].to(self.device)
+    def feed_data(self, low_data, high_data, need_H=True):
+        self.L = low_data
+        self.H = high_data
 
     # ----------------------------------------
     # feed L to netG and get E

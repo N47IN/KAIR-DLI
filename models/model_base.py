@@ -9,7 +9,7 @@ class ModelBase():
     def __init__(self, opt):
         self.opt = opt                         # opt
         self.save_dir = opt['path']['models']  # save models
-        self.device = torch.device('cuda' if opt['gpu_ids'] is not None else 'cpu')
+        self.device = torch.device('cpu')
         self.is_train = opt['is_train']        # training or not
         self.schedulers = []                   # schedulers
 
@@ -154,6 +154,7 @@ class ModelBase():
         for key, param in state_dict.items():
             state_dict[key] = param.cpu()
         torch.save(state_dict, save_path)
+        
 
     # ----------------------------------------
     # load the state_dict of the network

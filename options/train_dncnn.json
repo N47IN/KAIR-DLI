@@ -4,7 +4,7 @@
   , "gpu_ids": [0]
 
   , "scale": 1       // broadcast to "netG" if SISR
-  , "n_channels": 1  // broadcast to "datasets", 1 for grayscale, 3 for color
+  , "n_channels": 3  // broadcast to "datasets", 1 for grayscale, 3 for color
 
   , "merge_bn": true               // BN for DnCNN
   , "merge_bn_startpoint": 400000  // merge BN after N iterations
@@ -74,8 +74,8 @@
     , "G_regularizer_orthstep": null    // unused
     , "G_regularizer_clipstep": null    // unused
 
-    , "checkpoint_test": 5000           // for testing
-    , "checkpoint_save": 5000           // for saving model
+    , "checkpoint_test": 200           // for testing
+    , "checkpoint_save": 200          // for saving model
     , "checkpoint_print": 200           // for print
   }
 }

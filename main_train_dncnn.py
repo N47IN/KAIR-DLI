@@ -4,7 +4,17 @@ import argparse
 import time
 import random
 import numpy as np
+import os
+from PIL import Image
+from torch.utils.data import Dataset
+import torchvision.transforms as transforms
+from torch.utils.data import DataLoader
+import pickle
+
+import pickle
 from collections import OrderedDict
+from torch.utils.data import Dataset
+
 import logging
 import torch
 from torch.utils.data import DataLoader
@@ -41,16 +51,68 @@ from models.select_model import define_Model
 # https://github.com/xinntao/BasicSR
 # --------------------------------------------
 '''
+class DefectDataset(Dataset):
+    def __init__(self, root_dir,load_type, transform=None):
+        self.root_dir = root_dir
+        self.transform = transform
+        self.triplets = self._load_triplets(load_type)
+
+    def _load_triplets(self,load_type):
+        triplets = []
+        for object_name in os.listdir(self.root_dir):
+            #print(object_name)
+            object_path = os.path.join(self.root_dir, object_name, load_type)
+            degraded_path = os.path.join(object_path, 'Degraded_image')
+            mask_path = os.path.join(object_path, 'Defect_mask')
+            clean_path = os.path.join(object_path, 'GT_clean_image')
+            # Iterate through each defect type (broken_large, broken_small, etc.)
+            for defect_type in os.listdir(degraded_path):
+                #print(defect_type)
+                degraded_defect_dir = os.path.join(degraded_path, defect_type)
+                mask_defect_dir = os.path.join(mask_path, defect_type)
+                clean_defect_dir = os.path.join(clean_path, defect_type)
+                # Match image triplets by name in each defect folder
+                for img_name in os.listdir(degraded_defect_dir):
+                    degraded_img = os.path.join(degraded_defect_dir, img_name)
+                    mask_img = os.path.join(mask_defect_dir, img_name.replace(".png", "_mask.png"))
+                    clean_img = os.path.join(clean_defect_dir, img_name)
+                    # Only add the triplet if all three files exist
+                    if os.path.exists(degraded_img) and os.path.exists(mask_img) and os.path.exists(clean_img):
+                        triplets.append((degraded_img,clean_img))
+        return triplets
+
+    def __len__(self):
+        return len(self.triplets)
+
+    def __getitem__(self, idx):
+        degraded_img_path, clean_img_path = self.triplets[idx]
+        degraded_img = Image.open(degraded_img_path).convert("RGB")
+        clean_img = Image.open(clean_img_path).convert("RGB")
+
+        # Apply transforms, if any
+        if self.transform:
+            degraded_img = self.transform(degraded_img)
+            # mask_img = self.transform(mask_img)
+            clean_img = self.transform(clean_img)
+
+        return degraded_img, clean_img
+    
+transform = transforms.Compose([
+    transforms.Resize((256, 256)),  #change the size here according to the model
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),  
+    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),  # Normalize images
+])
 
 
-def main(json_path='options/train_dncnn.json'):
+def main(json_path='KAIR-DLI/options/train_dncnn.json'):
 
     '''
     # ----------------------------------------
     # Step--1 (prepare opt)
     # ----------------------------------------
     '''
-
+    torch.cuda.empty_cache()
     parser = argparse.ArgumentParser()
     parser.add_argument('-opt', type=str, default=json_path, help='Path to option JSON file.')
 
@@ -108,25 +170,14 @@ def main(json_path='options/train_dncnn.json'):
     # 1) create_dataset
     # 2) creat_dataloader for train and test
     # ----------------------------------------
-    dataset_type = opt['datasets']['train']['dataset_type']
-    for phase, dataset_opt in opt['datasets'].items():
-        if phase == 'train':
-            train_set = define_Dataset(dataset_opt)
-            train_size = int(math.ceil(len(train_set) / dataset_opt['dataloader_batch_size']))
-            logger.info('Number of train images: {:,d}, iters: {:,d}'.format(len(train_set), train_size))
-            train_loader = DataLoader(train_set,
-                                      batch_size=dataset_opt['dataloader_batch_size'],
-                                      shuffle=dataset_opt['dataloader_shuffle'],
-                                      num_workers=dataset_opt['dataloader_num_workers'],
-                                      drop_last=True,
-                                      pin_memory=True)
-        elif phase == 'test':
-            test_set = define_Dataset(dataset_opt)
-            test_loader = DataLoader(test_set, batch_size=1,
-                                     shuffle=False, num_workers=1,
-                                     drop_last=False, pin_memory=True)
-        else:
-            raise NotImplementedError("Phase [%s] is not recognized." % phase)
+
+    train_file = "KAIR-DLI/datasets-dli/dataloader_train_revisedv2.pkl"
+    with open(train_file, 'rb') as f:
+        train_loader = pickle.load(f)
+
+    test_file = "KAIR-DLI/datasets-dli/dataloader_val_revisedv2.pkl"
+    with open(test_file, 'rb') as f:
+        test_loader = pickle.load(f)
 
     '''
     # ----------------------------------------
@@ -154,9 +205,9 @@ def main(json_path='options/train_dncnn.json'):
         for i, train_data in enumerate(train_loader):
 
             current_step += 1
+            #import pdb;pdb.set_trace()
 
-            if dataset_type == 'dnpatch' and current_step % 20000 == 0:  # for 'train400'
-                train_loader.dataset.update_data()
+           
 
             # -------------------------------
             # 1) update learning rate
@@ -164,9 +215,12 @@ def main(json_path='options/train_dncnn.json'):
             model.update_learning_rate(current_step)
 
             # -------------------------------
-            # 2) feed patch pairs
+            # 2) feed patch pairs>>> t = torch.from_numpy(a)
+            degraded_imgs, clean_imgs = train_data
+            degraded_imgs = degraded_imgs.to("cuda")
+            clean_imgs = clean_imgs.to("cuda")
             # -------------------------------
-            model.feed_data(train_data)
+            model.feed_data(degraded_imgs, clean_imgs)
 
             # -------------------------------
             # 3) optimize parameters
