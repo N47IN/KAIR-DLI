@@ -262,13 +262,15 @@ def main(json_path='KAIR-DLI/options/train_dncnn.json'):
 
                 for test_data in test_loader:
                     idx += 1
-                    image_name_ext = os.path.basename(test_data['L_path'][0])
-                    img_name, ext = os.path.splitext(image_name_ext)
-
-                    img_dir = os.path.join(opt['path']['images'], img_name)
+                    # image_name_ext = os.path.basename(test_data['L_path'][0])
+                    # img_name, ext = os.path.splitext(image_name_ext)
+                    degraded_imgs, clean_imgs = test_data
+                    degraded_imgs = degraded_imgs.to("cuda")
+                    clean_imgs = clean_imgs.to("cuda")
+                    img_dir = opt['path']['images']
                     util.mkdir(img_dir)
 
-                    model.feed_data(test_data)
+                    model.feed_data(degraded_imgs, clean_imgs)
                     model.test()
 
                     visuals = model.current_visuals()
@@ -278,7 +280,7 @@ def main(json_path='KAIR-DLI/options/train_dncnn.json'):
                     # -----------------------
                     # save estimated image E
                     # -----------------------
-                    save_img_path = os.path.join(img_dir, '{:s}_{:d}.png'.format(img_name, current_step))
+                    save_img_path = os.path.join(img_dir, '{:d}_{:d}.png'.format(idx, current_step))
                     util.imsave(E_img, save_img_path)
 
                     # -----------------------
@@ -286,7 +288,7 @@ def main(json_path='KAIR-DLI/options/train_dncnn.json'):
                     # -----------------------
                     current_psnr = util.calculate_psnr(E_img, H_img, border=border)
 
-                    logger.info('{:->4d}--> {:>10s} | {:<4.2f}dB'.format(idx, image_name_ext, current_psnr))
+                    logger.info('{:->4d}--> {:>10s} | {:<4.2f}dB'.format(idx, save_img_path, current_psnr))
 
                     avg_psnr += current_psnr
 
