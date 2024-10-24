@@ -15,7 +15,7 @@ class DefectDataset(Dataset):
         triplets = []
         for object_name in os.listdir(self.root_dir):
             #print(object_name)
-            object_path = os.path.join(self.root_dir, object_name, 'Train')
+            object_path = os.path.join(self.root_dir, object_name, 'Val')
             degraded_path = os.path.join(object_path, 'Degraded_image')
             clean_path = os.path.join(object_path, 'GT_clean_image')
             # Iterate through each defect type (broken_large, broken_small, etc.)
@@ -46,19 +46,19 @@ class DefectDataset(Dataset):
         return degraded_img, clean_img
     
 transform = transforms.Compose([
-    transforms.Resize((256, 256)),  #change the size here according to the model
+    transforms.Resize((900, 900)),  #change the size here according to the model
     transforms.RandomHorizontalFlip(),
-    transforms.ToTensor(),  
-    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),  # Normalize images
+    transforms.ToTensor()
+      # Normalize images
 ])
 
 
 if __name__ == '__main__':
 
 # Create dataset and DataLoader
-    dataset = DefectDataset(root_dir='Denoising_Dataset_train_val\Denoising_Dataset_train_val', transform=transform)
-    data_loader = DataLoader(dataset, batch_size=8, shuffle=True, num_workers=1)
-    with open('dataloader_train_revisedv2.pkl', 'wb') as f:
+    dataset = DefectDataset(root_dir='Denoising_Dataset_train_val/Denoising_Dataset_train_val', transform=transform)
+    data_loader = DataLoader(dataset, batch_size=4, shuffle=True, num_workers=1)
+    with open('dataloader_val_revisedv3.pkl', 'wb') as f:
      pickle.dump(data_loader, f)
 
 # filename = "dataloader.pkl"

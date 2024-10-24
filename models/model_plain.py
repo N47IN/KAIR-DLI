@@ -147,8 +147,8 @@ class ModelPlain(ModelBase):
     # feed L/H data
     # ----------------------------------------
     def feed_data(self, low_data, high_data, need_H=True):
-        self.L = low_data
-        self.H = high_data
+        self.L = low_data.to(self.device)
+        self.H = high_data.to(self.device)
         # if need_H:
             # self.H = data['H'].to(self.device)
 
@@ -156,6 +156,7 @@ class ModelPlain(ModelBase):
     # feed L to netG
     # ----------------------------------------
     def netG_forward(self):
+        print("HI",self.device)
         self.E = self.netG(self.L)
 
     # ----------------------------------------

@@ -1,0 +1,407 @@
+24-10-24 05:45:45.908 :   task: msrresnet_psnr
+  model: plain
+  gpu_ids: [0, 1, 2, 3]
+  dist: False
+  scale: 4
+  n_channels: 3
+  sigma: 0
+  sigma_test: 0
+  merge_bn: False
+  merge_bn_startpoint: 400000
+  path:[
+    root: superresolution
+    pretrained_netG: None
+    pretrained_netE: None
+    task: superresolution/msrresnet_psnr
+    log: superresolution/msrresnet_psnr
+    options: superresolution/msrresnet_psnr/options
+    models: superresolution/msrresnet_psnr/models
+    images: superresolution/msrresnet_psnr/images
+    pretrained_optimizerG: None
+  ]
+  datasets:[
+    train:[
+      name: train_dataset
+      dataset_type: sr
+      dataroot_H: trainsets/trainH
+      dataroot_L: None
+      H_size: 96
+      dataloader_shuffle: True
+      dataloader_num_workers: 8
+      dataloader_batch_size: 32
+      phase: train
+      scale: 4
+      n_channels: 3
+    ]
+    test:[
+      name: test_dataset
+      dataset_type: sr
+      dataroot_H: testsets/set5
+      dataroot_L: None
+      phase: test
+      scale: 4
+      n_channels: 3
+    ]
+  ]
+  netG:[
+    net_type: msrresnet0
+    in_nc: 3
+    out_nc: 3
+    nc: 64
+    nb: 16
+    gc: 32
+    ng: 2
+    reduction: 16
+    act_mode: R
+    upsample_mode: upconv
+    downsample_mode: strideconv
+    init_type: orthogonal
+    init_bn_type: uniform
+    init_gain: 0.2
+    scale: 4
+  ]
+  train:[
+    G_lossfn_type: l1
+    G_lossfn_weight: 1.0
+    E_decay: 0.999
+    G_optimizer_type: adam
+    G_optimizer_lr: 0.0001
+    G_optimizer_wd: 0
+    G_optimizer_clipgrad: None
+    G_optimizer_reuse: False
+    G_scheduler_type: MultiStepLR
+    G_scheduler_milestones: [200000, 400000, 600000, 800000, 1000000, 2000000]
+    G_scheduler_gamma: 0.5
+    G_regularizer_orthstep: None
+    G_regularizer_clipstep: None
+    G_param_strict: True
+    E_param_strict: True
+    checkpoint_test: 5000
+    checkpoint_save: 5000
+    checkpoint_print: 200
+    F_feature_layer: 34
+    F_weights: 1.0
+    F_lossfn_type: l1
+    F_use_input_norm: True
+    F_use_range_norm: False
+    G_optimizer_betas: [0.9, 0.999]
+    G_scheduler_restart_weights: 1
+  ]
+  opt_path: options/train_msrresnet_psnr.json
+  is_train: True
+  find_unused_parameters: False
+  use_static_graph: False
+  num_gpu: 4
+  rank: 0
+  world_size: 1
+
+24-10-24 05:46:57.856 :   task: msrresnet_psnr
+  model: plain
+  gpu_ids: [0, 1, 2, 3]
+  dist: False
+  scale: 4
+  n_channels: 3
+  sigma: 0
+  sigma_test: 0
+  merge_bn: False
+  merge_bn_startpoint: 400000
+  path:[
+    root: superresolution
+    pretrained_netG: None
+    pretrained_netE: None
+    task: superresolution/msrresnet_psnr
+    log: superresolution/msrresnet_psnr
+    options: superresolution/msrresnet_psnr/options
+    models: superresolution/msrresnet_psnr/models
+    images: superresolution/msrresnet_psnr/images
+    pretrained_optimizerG: None
+  ]
+  datasets:[
+    train:[
+      name: train_dataset
+      dataset_type: sr
+      dataroot_H: trainsets/trainH
+      dataroot_L: None
+      H_size: 96
+      dataloader_shuffle: True
+      dataloader_num_workers: 8
+      dataloader_batch_size: 32
+      phase: train
+      scale: 4
+      n_channels: 3
+    ]
+    test:[
+      name: test_dataset
+      dataset_type: sr
+      dataroot_H: testsets/set5
+      dataroot_L: None
+      phase: test
+      scale: 4
+      n_channels: 3
+    ]
+  ]
+  netG:[
+    net_type: msrresnet0
+    in_nc: 3
+    out_nc: 3
+    nc: 64
+    nb: 16
+    gc: 32
+    ng: 2
+    reduction: 16
+    act_mode: R
+    upsample_mode: upconv
+    downsample_mode: strideconv
+    init_type: orthogonal
+    init_bn_type: uniform
+    init_gain: 0.2
+    scale: 4
+  ]
+  train:[
+    G_lossfn_type: l1
+    G_lossfn_weight: 1.0
+    E_decay: 0.999
+    G_optimizer_type: adam
+    G_optimizer_lr: 0.0001
+    G_optimizer_wd: 0
+    G_optimizer_clipgrad: None
+    G_optimizer_reuse: False
+    G_scheduler_type: MultiStepLR
+    G_scheduler_milestones: [200000, 400000, 600000, 800000, 1000000, 2000000]
+    G_scheduler_gamma: 0.5
+    G_regularizer_orthstep: None
+    G_regularizer_clipstep: None
+    G_param_strict: True
+    E_param_strict: True
+    checkpoint_test: 5000
+    checkpoint_save: 5000
+    checkpoint_print: 200
+    F_feature_layer: 34
+    F_weights: 1.0
+    F_lossfn_type: l1
+    F_use_input_norm: True
+    F_use_range_norm: False
+    G_optimizer_betas: [0.9, 0.999]
+    G_scheduler_restart_weights: 1
+  ]
+  opt_path: options/train_msrresnet_psnr.json
+  is_train: True
+  find_unused_parameters: False
+  use_static_graph: False
+  num_gpu: 4
+  rank: 0
+  world_size: 1
+
+24-10-24 05:46:58.294 : 
+Networks name: MSRResNet0
+Params number: 1332928
+Net structure:
+MSRResNet0(
+  (model): Sequential(
+    (0): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): Identity + 
+    |Sequential(
+    |  (0): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (1): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (2): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (3): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (4): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (5): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (6): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (7): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (8): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (9): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (10): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (11): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (12): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (13): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (14): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (15): ResBlock(
+    |    (res): Sequential(
+    |      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |      (1): ReLU(inplace=True)
+    |      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |    )
+    |  )
+    |  (16): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    |)
+    (2): Upsample(scale_factor=2.0, mode='nearest')
+    (3): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (4): ReLU(inplace=True)
+    (5): Upsample(scale_factor=2.0, mode='nearest')
+    (6): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (7): ReLU(inplace=True)
+    (8): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (9): ReLU(inplace=True)
+    (10): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+  )
+)
+
+24-10-24 05:46:58.304 : 
+ |  mean  |  min   |  max   |  std   || shape               
+ | -0.000 | -0.093 |  0.092 |  0.025 | torch.Size([64, 3, 3, 3]) || model.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.0.bias
+ | -0.000 | -0.033 |  0.034 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.0.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.0.res.0.bias
+ | -0.000 | -0.035 |  0.030 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.0.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.0.res.2.bias
+ |  0.000 | -0.036 |  0.032 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.1.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.1.res.0.bias
+ |  0.000 | -0.032 |  0.035 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.1.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.1.res.2.bias
+ | -0.000 | -0.040 |  0.033 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.2.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.2.res.0.bias
+ |  0.000 | -0.039 |  0.033 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.2.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.2.res.2.bias
+ |  0.000 | -0.034 |  0.034 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.3.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.3.res.0.bias
+ |  0.000 | -0.037 |  0.038 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.3.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.3.res.2.bias
+ |  0.000 | -0.035 |  0.031 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.4.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.4.res.0.bias
+ | -0.000 | -0.034 |  0.035 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.4.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.4.res.2.bias
+ | -0.000 | -0.033 |  0.037 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.5.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.5.res.0.bias
+ |  0.000 | -0.032 |  0.032 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.5.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.5.res.2.bias
+ |  0.000 | -0.036 |  0.032 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.6.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.6.res.0.bias
+ |  0.000 | -0.034 |  0.034 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.6.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.6.res.2.bias
+ | -0.000 | -0.035 |  0.035 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.7.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.7.res.0.bias
+ |  0.000 | -0.038 |  0.033 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.7.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.7.res.2.bias
+ |  0.000 | -0.031 |  0.034 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.8.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.8.res.0.bias
+ | -0.000 | -0.034 |  0.036 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.8.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.8.res.2.bias
+ |  0.000 | -0.035 |  0.030 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.9.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.9.res.0.bias
+ |  0.000 | -0.034 |  0.036 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.9.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.9.res.2.bias
+ |  0.000 | -0.038 |  0.032 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.10.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.10.res.0.bias
+ | -0.000 | -0.036 |  0.036 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.10.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.10.res.2.bias
+ | -0.000 | -0.031 |  0.035 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.11.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.11.res.0.bias
+ | -0.000 | -0.031 |  0.039 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.11.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.11.res.2.bias
+ |  0.000 | -0.033 |  0.036 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.12.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.12.res.0.bias
+ | -0.000 | -0.035 |  0.037 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.12.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.12.res.2.bias
+ | -0.000 | -0.033 |  0.036 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.13.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.13.res.0.bias
+ | -0.000 | -0.034 |  0.034 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.13.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.13.res.2.bias
+ |  0.000 | -0.033 |  0.041 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.14.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.14.res.0.bias
+ |  0.000 | -0.033 |  0.030 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.14.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.14.res.2.bias
+ |  0.000 | -0.032 |  0.034 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.15.res.0.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.15.res.0.bias
+ | -0.000 | -0.033 |  0.033 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.15.res.2.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.15.res.2.bias
+ |  0.000 | -0.044 |  0.040 |  0.008 | torch.Size([64, 64, 3, 3]) || model.1.sub.16.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.1.sub.16.bias
+ | -0.000 | -0.040 |  0.032 |  0.008 | torch.Size([64, 64, 3, 3]) || model.3.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.3.bias
+ | -0.000 | -0.036 |  0.034 |  0.008 | torch.Size([64, 64, 3, 3]) || model.6.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.6.bias
+ | -0.000 | -0.035 |  0.038 |  0.008 | torch.Size([64, 64, 3, 3]) || model.8.weight
+ |  0.000 |  0.000 |  0.000 |  0.000 | torch.Size([64]) || model.8.bias
+ |  0.000 | -0.038 |  0.030 |  0.008 | torch.Size([3, 64, 3, 3]) || model.10.weight
+

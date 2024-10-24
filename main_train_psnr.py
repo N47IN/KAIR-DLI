@@ -1,5 +1,6 @@
 import os.path
 import math
+import pickle
 import argparse
 import random
 import numpy as np
@@ -7,6 +8,35 @@ import logging
 from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 import torch
+import os.path
+import math
+import argparse
+import time
+import random
+import numpy as np
+import os
+from PIL import Image
+from torch.utils.data import Dataset
+import torchvision.transforms as transforms
+from torch.utils.data import DataLoader
+import pickle
+
+import pickle
+from collections import OrderedDict
+from torch.utils.data import Dataset
+
+import logging
+import torch
+from torch.utils.data import DataLoader
+
+
+from utils import utils_logger
+from utils import utils_image as util
+from utils import utils_option as option
+
+from data.select_dataset import define_Dataset
+from models.select_model import define_Model
+
 
 from utils import utils_logger
 from utils import utils_image as util
@@ -28,6 +58,57 @@ from models.select_model import define_Model
 # --------------------------------------------
 '''
 
+class DefectDataset(Dataset):
+    def __init__(self, root_dir,load_type, transform=None):
+        self.root_dir = root_dir
+        self.transform = transform
+        self.triplets = self._load_triplets(load_type)
+
+    def _load_triplets(self,load_type):
+        triplets = []
+        for object_name in os.listdir(self.root_dir):
+            #print(object_name)
+            object_path = os.path.join(self.root_dir, object_name, load_type)
+            degraded_path = os.path.join(object_path, 'Degraded_image')
+            mask_path = os.path.join(object_path, 'Defect_mask')
+            clean_path = os.path.join(object_path, 'GT_clean_image')
+            # Iterate through each defect type (broken_large, broken_small, etc.)
+            for defect_type in os.listdir(degraded_path):
+                #print(defect_type)
+                degraded_defect_dir = os.path.join(degraded_path, defect_type)
+                mask_defect_dir = os.path.join(mask_path, defect_type)
+                clean_defect_dir = os.path.join(clean_path, defect_type)
+                # Match image triplets by name in each defect folder
+                for img_name in os.listdir(degraded_defect_dir):
+                    degraded_img = os.path.join(degraded_defect_dir, img_name)
+                    mask_img = os.path.join(mask_defect_dir, img_name.replace(".png", "_mask.png"))
+                    clean_img = os.path.join(clean_defect_dir, img_name)
+                    # Only add the triplet if all three files exist
+                    if os.path.exists(degraded_img) and os.path.exists(mask_img) and os.path.exists(clean_img):
+                        triplets.append((degraded_img,clean_img))
+        return triplets
+
+    def __len__(self):
+        return len(self.triplets)
+
+    def __getitem__(self, idx):
+        degraded_img_path, clean_img_path = self.triplets[idx]
+        degraded_img = Image.open(degraded_img_path).convert("RGB")
+        clean_img = Image.open(clean_img_path).convert("RGB")
+
+        # Apply transforms, if any
+        if self.transform:
+            degraded_img = self.transform(degraded_img)
+            # mask_img = self.transform(mask_img)
+            clean_img = self.transform(clean_img)
+
+        return degraded_img, clean_img
+    
+transform = transforms.Compose([
+    transforms.Resize((900, 900)),  #change the size here according to the model
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),    # Normalize images
+])
 
 def main(json_path='options/train_msrresnet_psnr.json'):
 
@@ -113,36 +194,14 @@ def main(json_path='options/train_msrresnet_psnr.json'):
     # 1) create_dataset
     # 2) creat_dataloader for train and test
     # ----------------------------------------
-    for phase, dataset_opt in opt['datasets'].items():
-        if phase == 'train':
-            train_set = define_Dataset(dataset_opt)
-            train_size = int(math.ceil(len(train_set) / dataset_opt['dataloader_batch_size']))
-            if opt['rank'] == 0:
-                logger.info('Number of train images: {:,d}, iters: {:,d}'.format(len(train_set), train_size))
-            if opt['dist']:
-                train_sampler = DistributedSampler(train_set, shuffle=dataset_opt['dataloader_shuffle'], drop_last=True, seed=seed)
-                train_loader = DataLoader(train_set,
-                                          batch_size=dataset_opt['dataloader_batch_size']//opt['num_gpu'],
-                                          shuffle=False,
-                                          num_workers=dataset_opt['dataloader_num_workers']//opt['num_gpu'],
-                                          drop_last=True,
-                                          pin_memory=True,
-                                          sampler=train_sampler)
-            else:
-                train_loader = DataLoader(train_set,
-                                          batch_size=dataset_opt['dataloader_batch_size'],
-                                          shuffle=dataset_opt['dataloader_shuffle'],
-                                          num_workers=dataset_opt['dataloader_num_workers'],
-                                          drop_last=True,
-                                          pin_memory=True)
+    train_file = "/home/navin/coursework/kla-challenge-dli/KAIR-DLI/datasets-dli/dataloader_train_revisedv3.pkl"
+    with open(train_file, 'rb') as f:
+        train_loader = pickle.load(f)
+        print("_________________")
 
-        elif phase == 'test':
-            test_set = define_Dataset(dataset_opt)
-            test_loader = DataLoader(test_set, batch_size=1,
-                                     shuffle=False, num_workers=1,
-                                     drop_last=False, pin_memory=True)
-        else:
-            raise NotImplementedError("Phase [%s] is not recognized." % phase)
+    test_file = "/home/navin/coursework/kla-challenge-dli/KAIR-DLI/datasets-dli/dataloader_val_revisedv3.pkl"
+    with open(test_file, 'rb') as f:
+        test_loader = pickle.load(f)
 
     '''
     # ----------------------------------------
@@ -163,8 +222,7 @@ def main(json_path='options/train_msrresnet_psnr.json'):
     '''
 
     for epoch in range(1000000):  # keep running
-        if opt['dist']:
-            train_sampler.set_epoch(epoch + seed)
+        
 
         for i, train_data in enumerate(train_loader):
 
@@ -177,8 +235,11 @@ def main(json_path='options/train_msrresnet_psnr.json'):
 
             # -------------------------------
             # 2) feed patch pairs
+            degraded_imgs, clean_imgs = train_data
+            degraded_imgs = degraded_imgs.to("cuda")
+            clean_imgs = clean_imgs.to("cuda")
             # -------------------------------
-            model.feed_data(train_data)
+            model.feed_data(degraded_imgs, clean_imgs)
 
             # -------------------------------
             # 3) optimize parameters
@@ -212,13 +273,13 @@ def main(json_path='options/train_msrresnet_psnr.json'):
 
                 for test_data in test_loader:
                     idx += 1
-                    image_name_ext = os.path.basename(test_data['L_path'][0])
-                    img_name, ext = os.path.splitext(image_name_ext)
-
-                    img_dir = os.path.join(opt['path']['images'], img_name)
+                    degraded_imgs, clean_imgs = test_data
+                    degraded_imgs = degraded_imgs.to("cuda")
+                    clean_imgs = clean_imgs.to("cuda")
+                    img_dir = opt['path']['images']
                     util.mkdir(img_dir)
 
-                    model.feed_data(test_data)
+                    model.feed_data(degraded_imgs, clean_imgs)
                     model.test()
 
                     visuals = model.current_visuals()
@@ -228,7 +289,7 @@ def main(json_path='options/train_msrresnet_psnr.json'):
                     # -----------------------
                     # save estimated image E
                     # -----------------------
-                    save_img_path = os.path.join(img_dir, '{:s}_{:d}.png'.format(img_name, current_step))
+                    save_img_path = os.path.join(img_dir, '{:d}_{:d}.png'.format(idx, current_step))
                     util.imsave(E_img, save_img_path)
 
                     # -----------------------
@@ -236,7 +297,7 @@ def main(json_path='options/train_msrresnet_psnr.json'):
                     # -----------------------
                     current_psnr = util.calculate_psnr(E_img, H_img, border=border)
 
-                    logger.info('{:->4d}--> {:>10s} | {:<4.2f}dB'.format(idx, image_name_ext, current_psnr))
+                    logger.info('{:->4d}--> {:>10s} | {:<4.2f}dB'.format(idx, save_img_path, current_psnr))
 
                     avg_psnr += current_psnr
 

@@ -9,7 +9,7 @@ class ModelBase():
     def __init__(self, opt):
         self.opt = opt                         # opt
         self.save_dir = opt['path']['models']  # save models
-        self.device = torch.device('cpu')
+        self.device = torch.device('cuda')
         self.is_train = opt['is_train']        # training or not
         self.schedulers = []                   # schedulers
 
@@ -100,6 +100,7 @@ class ModelBase():
         Args:
             network (nn.Module)
         """
+        print("EDVICEEEE, sl")
         network = network.to(self.device)
         if self.opt['dist']:
             find_unused_parameters = self.opt.get('find_unused_parameters', True)

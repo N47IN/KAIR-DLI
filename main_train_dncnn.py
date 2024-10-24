@@ -171,11 +171,12 @@ def main(json_path='KAIR-DLI/options/train_dncnn.json'):
     # 2) creat_dataloader for train and test
     # ----------------------------------------
 
-    train_file = "KAIR-DLI/datasets-dli/dataloader_train_revisedv2.pkl"
+    train_file = "/home/navin/coursework/kla-challenge-dli/KAIR-DLI/datasets-dli/dataloader_train_revisedv3.pkl"
     with open(train_file, 'rb') as f:
         train_loader = pickle.load(f)
+        print("_________________")
 
-    test_file = "KAIR-DLI/datasets-dli/dataloader_val_revisedv2.pkl"
+    test_file = "/home/navin/coursework/kla-challenge-dli/KAIR-DLI/datasets-dli/dataloader_val_revisedv3.pkl"
     with open(test_file, 'rb') as f:
         test_loader = pickle.load(f)
 
